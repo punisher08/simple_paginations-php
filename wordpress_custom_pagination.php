@@ -21,23 +21,28 @@
 		$request_form_quote_entries = $wpdb->prefix.'request_quotes_entries';
 		$customPagHTML     = "";
 		$query             = "SELECT * FROM $request_form_quote_entries";
-		$total_query     = "SELECT * FROM COUNT(1) AS combined_table";
-		$total = $wpdb->get_var($total_query );
-		// $total             = count($results_pag);
+		$total_query     = $wpdb->get_results($query);
+		$total = count($total_query);
 		$items_per_page = 10;
 		$page             = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1;
 		$offset         = ( $page * $items_per_page ) - $items_per_page;
-		$totalPage         = ceil(23 / $items_per_page);
+		$totalPage         = ceil($total / $items_per_page);
 
-		if($totalPage > 1){
-		$customPagHTML     =  '<div><span>Page '.$page.' of '.$totalPage.'</span>'.paginate_links( array(
-		'base' => add_query_arg( 'cpage', '%#%' ),
-		'format' => '',
-		'prev_text' => __('&laquo;'),
-		'next_text' => __('&raquo;'),
-		'total' => $totalPage,
-		'current' => $page
-		)).'</div>';
+		if($totalPage > 1)
+		{
+			$customPagHTML_count     =  '<div class="quotes_entries_count"><span>Page '.$page.' of '.$totalPage.'</span> </div>';
+			$customPagHTML = 
+			'<div class="quotes_entries_pager">'
+			.paginate_links( array(
+			'base' => add_query_arg( 'cpage', '%#%' ),
+			'format' => '',
+			'prev_text' => __('&laquo;'),
+			'next_text' => __('&raquo;'),
+			'total' => $totalPage,
+			'current' => $page
+			)).
+			'</div>'
+			;
 		}
 		// end pagination
 		$results         = $wpdb->get_results( $query  . " ORDER BY ID ASC LIMIT $offset, $items_per_page" );
@@ -71,14 +76,6 @@
 		<?php
 	?>
 </div>
-		<?php
-		
-		
-			echo $customPagHTML;
-
-
-		
-
-			
-		
-	
+<?php		
+echo $customPagHTML_count;
+echo $customPagHTML;
